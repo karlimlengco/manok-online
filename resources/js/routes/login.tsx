@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
+import { getPendingCartItem } from '../lib/pending-cart';
 
 export const Route = createFileRoute('/login')({
     component: LoginPage,
@@ -19,8 +20,9 @@ function LoginPage() {
         setError('');
         setLoading(true);
         try {
+            const hadPending = !!getPendingCartItem();
             await login({ email, password });
-            navigate({ to: '/' });
+            navigate({ to: hadPending ? '/cart' : '/' });
         } catch (err: any) {
             setError(
                 err?.response?.data?.message ?? 'Invalid credentials. Please try again.',

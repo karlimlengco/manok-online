@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
+import { getPendingCartItem } from '../lib/pending-cart';
 
 export const Route = createFileRoute('/register')({
     component: RegisterPage,
@@ -28,8 +29,9 @@ function RegisterPage() {
         setGeneralError('');
         setLoading(true);
         try {
+            const hadPending = !!getPendingCartItem();
             await register(form);
-            navigate({ to: '/' });
+            navigate({ to: hadPending ? '/cart' : '/' });
         } catch (err: any) {
             if (err?.response?.status === 422) {
                 setErrors(err.response.data.errors ?? {});

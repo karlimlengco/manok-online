@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         staleTime: 1000 * 60 * 5,
     });
 
-    const processPendingCart = useCallback(async () => {
+    const processPendingCart = async () => {
         const pending = getPendingCartItem();
         if (!pending) return;
         clearPendingCartItem();
@@ -50,17 +50,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
             // silently ignore — product may be out of stock
         }
-    }, [queryClient]);
+    };
 
     const loginMutation = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
             await authApi.getCsrfCookie();
             const res = await authApi.login(data);
-            return res.data;
-        },
-        onSuccess: async (user) => {
-            queryClient.setQueryData(['auth', 'user'], user);
+            queryClient.setQueryData(['auth', 'user'], res.data);
             await processPendingCart();
+            return res.data;
         },
     });
 
@@ -73,11 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }) => {
             await authApi.getCsrfCookie();
             const res = await authApi.register(data);
-            return res.data;
-        },
-        onSuccess: async (user) => {
-            queryClient.setQueryData(['auth', 'user'], user);
+            queryClient.setQueryData(['auth', 'user'], res.data);
             await processPendingCart();
+            return res.data;
         },
     });
 
