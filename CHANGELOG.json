@@ -1,0 +1,52 @@
+[
+  {
+    "version": "1.0.0",
+    "date": "2026-04-04",
+    "changes": [
+      {
+        "type": "added",
+        "description": "User registration and login with Sanctum cookie-based authentication"
+      },
+      {
+        "type": "added",
+        "description": "Product catalog with breed, category, and price filtering and sorting"
+      },
+      {
+        "type": "added",
+        "description": "Product detail pages with image gallery and rooster specifications"
+      },
+      {
+        "type": "added",
+        "description": "Category browsing with dedicated category pages"
+      },
+      {
+        "type": "added",
+        "description": "Shopping cart with add, update quantity, and remove functionality"
+      },
+      {
+        "type": "added",
+        "description": "Checkout flow with shipping address selection and order placement"
+      },
+      {
+        "type": "added",
+        "description": "Order history and order detail pages"
+      },
+      {
+        "type": "added",
+        "description": "Address management for shipping"
+      },
+      {
+        "type": "added",
+        "description": "Admin panel for product, category, and order management"
+      },
+      {
+        "type": "added",
+        "description": "Role-based access control with admin role"
+      },
+      {
+        "type": "added",
+        "description": "Security headers, rate limiting, and XSS protection"
+      }
+    ]
+  }
+]
