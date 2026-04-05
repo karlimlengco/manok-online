@@ -1,7 +1,9 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addToCart } from '../lib/api';
+import { useAuth } from '../lib/auth';
+import { setPendingCartItem } from '../lib/pending-cart';
 import type { Product } from '../types/models';
 import { formatCurrency } from '../lib/utils';
 
@@ -11,6 +13,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
     const queryClient = useQueryClient();
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     const addMutation = useMutation({
         mutationFn: () => addToCart({ product_uuid: product.uuid, quantity: 1 }),
@@ -79,7 +83,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                 <div className="mt-auto pt-3">
                     <button
-                        onClick={() => addMutation.mutate()}
+                        onClick={() => {
+                            if (!isAuthenticated) {
+                                setPendingCartItem({ product_uuid: product.uuid, quantity: 1 });
+                                navigate({ to: '/login' });
+                                return;
+                            }
+                            addMutation.mutate();
+                        }}
                         disabled={!isAvailable || addMutation.isPending}
                         className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >

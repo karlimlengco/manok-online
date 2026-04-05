@@ -11,8 +11,8 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
-Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
+// Auth routes
+Route::prefix('auth')->middleware('throttle:30,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });

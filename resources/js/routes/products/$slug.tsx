@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { getProduct, addToCart } from '../../lib/api';
+import { useAuth } from '../../lib/auth';
+import { setPendingCartItem } from '../../lib/pending-cart';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatCurrency } from '../../lib/utils';
 import { ShoppingCartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
@@ -14,6 +16,8 @@ export const Route = createFileRoute('/products/$slug')({
 function ProductDetailPage() {
     const { slug } = Route.useParams();
     const queryClient = useQueryClient();
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
 
@@ -169,7 +173,14 @@ function ProductDetailPage() {
                             </div>
 
                             <button
-                                onClick={() => addMutation.mutate()}
+                                onClick={() => {
+                                    if (!isAuthenticated) {
+                                        setPendingCartItem({ product_uuid: product.uuid, quantity });
+                                        navigate({ to: '/login' });
+                                        return;
+                                    }
+                                    addMutation.mutate();
+                                }}
                                 disabled={addMutation.isPending}
                                 className="flex flex-1 items-center justify-center gap-2 rounded-md bg-amber-600 px-6 py-3 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
                             >

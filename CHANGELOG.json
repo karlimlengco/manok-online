@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.1",
+    "date": "2026-04-05",
+    "changes": [
+      {
+        "type": "fixed",
+        "description": "Registration and login now work correctly (session store error resolved)"
+      },
+      {
+        "type": "fixed",
+        "description": "Add to cart now works for logged-in users"
+      },
+      {
+        "type": "changed",
+        "description": "Unauthenticated users are redirected to login when adding to cart"
+      }
+    ]
+  },
+  {
     "version": "1.0.0",
     "date": "2026-04-04",
     "changes": [

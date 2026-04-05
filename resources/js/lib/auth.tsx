@@ -1,6 +1,8 @@
 import { type ReactNode, createContext, useContext, useCallback } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import * as authApi from './api';
+import { addToCart } from './api';
+import { getPendingCartItem, clearPendingCartItem } from './pending-cart';
 import type { User } from '../types/models';
 
 interface AuthContextValue {
@@ -38,13 +40,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         staleTime: 1000 * 60 * 5,
     });
 
+    const processPendingCart = useCallback(async () => {
+        const pending = getPendingCartItem();
+        if (!pending) return;
+        clearPendingCartItem();
+        try {
+            await addToCart(pending);
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
+        } catch {
+            // silently ignore — product may be out of stock
+        }
+    }, [queryClient]);
+
     const loginMutation = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
             await authApi.getCsrfCookie();
-            await authApi.login(data);
+            const res = await authApi.login(data);
+            return res.data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+        onSuccess: async (user) => {
+            queryClient.setQueryData(['auth', 'user'], user);
+            await processPendingCart();
         },
     });
 
@@ -56,10 +72,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             password_confirmation: string;
         }) => {
             await authApi.getCsrfCookie();
-            await authApi.register(data);
+            const res = await authApi.register(data);
+            return res.data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+        onSuccess: async (user) => {
+            queryClient.setQueryData(['auth', 'user'], user);
+            await processPendingCart();
         },
     });
 
